@@ -158,3 +158,104 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# -----------------------------
+# Python / Flask Project Ignore
+# -----------------------------
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+env/
+.venv/
+
+# Flask instance folder (for uploads, etc.)
+instance/
+*.db
+*.sqlite3
+
+# Environment variables / credentials
+*.env
+.env.*
+!example.env  # keep example if needed
+
+# MongoDB dump or local data
+dump/
+*.bson
+*.json
+
+# Log files
+*.log
+logs/
+*.pid
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# Testing / Coverage
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Jupyter notebooks
+.ipynb_checkpoints
+
+# Cache
+*.cache
+.cache/
+__pypackages__/
+pip-wheel-metadata/
+
+# Local configuration
+config.local.json
+config.dev.json
+
+# Temporary files
+tmp/
+temp/
+*.bak
+*.tmp
+*.old
+
+# Node-related (if frontend or React is included later)
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Deployment-related
+*.pem
+*.key
+*.crt
+*.csr
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# PyCharm specific
+*.iml
+.idea/
