@@ -153,7 +153,7 @@ def init_routes(app):
 
         # Fetch wallet balance
         wallet_doc = wallets_col.find_one({"UserID": identity})
-        wallet_balance = wallet_doc["Amount"] if wallet_doc else 0.0
+        wallet_balance = wallet_doc["Amount"] if wallet_doc else 1000.0
 
         # Fetch all transactions for this user
         user_transactions = list(transactions_col.find(
