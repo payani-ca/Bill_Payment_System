@@ -185,6 +185,7 @@ instance/
 !example.env  # keep example if needed
 
 
+
 # Log files
 *.log
 logs/

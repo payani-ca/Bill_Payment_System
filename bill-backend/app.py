@@ -7,9 +7,12 @@ from electricity import electricity_bp
 from recharge import recharge_bp
 from dth import dth_bp
 from creditcard import credit_bp
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", secrets.token_hex(32))
+
+CORS(app, supports_credentials=True)
 
 # Run seeding once at startup
 with app.app_context():
