@@ -238,6 +238,61 @@ def init_routes(app):
             "new_balance": wallet_doc["Amount"] - amount
         }), 200
 
+    @app.route("/wallet/topup", methods=["POST"])
+    @jwt_required()
+    def wallet_topup():
+        data = request.get_json(force=True)
+        user_id = get_jwt_identity()
+
+        wallet_doc = wallets_col.find_one({"UserID": user_id})
+        if not wallet_doc:
+            return jsonify({"msg": "Wallet not found"}), 404
+
+        # Validate MPIN
+        input_mpin = data.get("mpin")
+        if not input_mpin or not check_password(input_mpin, wallet_doc["MPIN"]):
+            return jsonify({"msg": "Invalid MPIN"}), 401
+
+        # Validate amount
+        amount = float(data.get("amount", 0))
+        if amount <= 0:
+            return jsonify({"msg": "Top-up amount must be positive"}), 400
+
+        old_balance = wallet_doc["Amount"]
+        new_balance = old_balance + amount
+
+        # Record the transaction
+        tx_doc = {
+            "TxID": str(uuid.uuid4()),
+            "UserID": user_id,
+            "Amount": amount,
+            "Utility": "Wallet Top-up",
+            "VendorDetails": "Self / Payment Gateway",
+            "Timestamp": datetime.now(),
+            "Status": "Paid",
+            "ServiceNo": str(uuid.uuid4())
+        }
+        transactions_col.insert_one(tx_doc)
+
+        # Update wallet balance
+        wallets_col.update_one(
+            {"UserID": user_id},
+            {
+                "$inc": {"Amount": amount},
+                "$push": {"Transaction": tx_doc},
+                "$set": {"LastModified": datetime.now()}
+            }
+        )
+
+        return jsonify({
+            "msg": "Wallet top-up successful",
+            "transaction_id": tx_doc["TxID"],
+            "old_balance": old_balance,
+            "topup_amount": amount,
+            "new_balance": new_balance
+        }), 200
+
+
     # ------------------ Reminders ------------------
     @app.route("/reminders", methods=["GET", "POST"])
     @jwt_required()

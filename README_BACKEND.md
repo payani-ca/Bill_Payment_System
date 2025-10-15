@@ -17,12 +17,12 @@ http://localhost:5000/register
     "userID":"capayani",
   "name": "John Doe",
   "password": "Pass123!",
-  "mobile": "9876543211",
+  "mobile": "9876543210",
   "dob": "1990-01-01",
   "city": "Mumbai",
   "country": "India",
   "mpin": "1234",
-  "pan": "DROO7827U",
+  "pan": "DROOO7827U",
   "aadhar": "123456792678",
   "wallet_balance": 1000
 }
@@ -227,6 +227,13 @@ Res:
 
 Electricity:
 service_no = f"E-{sum_ascii('electricity')}-{sum_ascii(provider)}-{sum_ascii(user_id)}-{sum_ascii(today)}"
+
+POST
+http://localhost:5000/wallet/topup
+{
+      "amount": "1000",
+  "mpin": "1234"
+}
 
 # #########################
 
