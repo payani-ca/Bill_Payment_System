@@ -41,34 +41,7 @@ POST
 http://localhost:5000/logout
 
 add access tokens in auth headers
-
-
-# To get service# for electricity
-POST
-http://localhost:5000/electricity/service_no
-{
-  "state": "Tamil Nadu",
-  "provider": "TNEB"
-}
-
-POST
-http://localhost:5000/recharge/service_no
-{
-  "provider": "Airtel"
-}
-
-POST
-http://localhost:5000/dth/service_no
-{
-  "provider": "Airtel DTH"
-}
-
-POST
-http://localhost:5000/creditcard/service_no
-{
-  "provider": "SBI Card"
-}
-
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MDUyNzA1OCwianRpIjoiN2ZiODZmMDAtMjUzMy00YWY2LTk3M2UtMTM1N2NiNzY4MWU0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImNhcGF5YW5pIiwibmJmIjoxNzYwNTI3MDU4LCJjc3JmIjoiMGYyNjY1YWEtZTI1My00Njk1LTg2YzUtM2ZmNTI5NjQwMzgyIiwiZXhwIjoxNzYwNTI3OTU4LCJyb2xlIjoidXNlciJ9.NshGjDajHAG4LefKAOnKjGPmgu6wiRVutacjmeexbB4
 # bills endpoint to fetch amount to be paid
 POST
 http://localhost:5000/electricity/bill
@@ -77,10 +50,24 @@ http://localhost:5000/electricity/bill
   "provider": "TNEB"
 }
 
+res:
+{
+    "ServiceNo": "E-1185-297-838-490",
+    "bill_amount": 281.0,
+    "userID": "capayani"
+}
+
 POST
 http://localhost:5000/recharge/bill
 {
   "provider": "Airtel"
+}
+
+res:
+{
+    "ServiceNo": "R-833-609-838-490",
+    "bill_amount": 277.0,
+    "userID": "capayani"
 }
 
 POST
@@ -88,25 +75,95 @@ http://localhost:5000/dth/bill
 {
   "provider": "Airtel DTH"
 }
+res:
+{
+    "ServiceNo": "D-320-865-838-490",
+    "bill_amount": 251.3,
+    "userID": "capayani"
+}
 
 POST
 http://localhost:5000/creditcard/bill
 {
   "provider": "SBI Card"
 }
-
+res:
+{
+    "ServiceNo": "C-1045-632-838-490",
+    "bill_amount": 294.1,
+    "userID": "capayani"
+}
 # endpoints for payment
 
 POST
 http://localhost:5000/creditcard/pay
 {
-    "service_no": "C-833-609-838-490",
-    "bill_amount": 277.0,
+    "service_no": "C-1045-632-838-490",
+    "bill_amount": 294.1,
     "mobile":"9876543210",
   "state": "Tamil Nadu",
   "provider": "SBI Card",
   "mpin":"1234",
   "card_number": 15655276562625
+}
+
+res:
+{
+    "RemainingBalance": 705.9,
+    "TxID": "c403eb22-e11a-48fb-9606-7adb69ab26f1",
+    "msg": "Credit Card payment successful"
+}
+
+
+POST
+http://localhost:5000/dth/pay
+{
+    "service_no": "D-320-865-838-490",
+    "bill_amount": 251.3,
+    "mobile":"9876543210",
+  "state": "Tamil Nadu",
+  "provider": "Airtel DTH",
+  "mpin":"1234"
+}
+res:
+{
+    "msg": "DTH payment successful",
+    "new_balance": 454.59999999999997,
+    "vendor": "DTH : Airtel DTH"
+}
+
+POST
+http://localhost:5000/recharge/pay
+{
+    "service_no": "R-833-609-838-490",
+    "bill_amount": 111,
+    "mobile":"9876543210",
+  "state": "Tamil Nadu",
+  "provider": "Airtel",
+  "mpin":"1234"
+} 
+Res:
+{
+    "msg": "Recharge successful",
+    "new_balance": 343.59999999999997,
+    "vendor": "Recharge : Airtel"
+}
+
+POST
+http://localhost:5000/electricity/pay
+{
+    "service_no": "E-1185-297-838-490",
+    "bill_amount": 111,
+    "mobile":"9876543210",
+  "state": "Tamil Nadu",
+  "provider": "TANGEDCO",
+  "mpin":"1234"
+}
+Res:
+{
+    "msg": "Electricity payment successful",
+    "new_balance": 232.59999999999997,
+    "vendor": "Electricity : Tamil Nadu : TANGEDCO"
 }
 
 #Prasad
