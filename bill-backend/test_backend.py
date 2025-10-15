@@ -6,6 +6,10 @@ BASE_URL = "http://localhost:5000"
 recharge_service_no = ""
 dth_service_no = ""
 cc_service_no = ""
+gas_service_no = ""
+water_service_no = ""
+loan_service_no = ""
+fasttag_service_no = ""
 
 # -------------------- FIXTURES --------------------
 
@@ -210,6 +214,122 @@ def test_creditcard_pay(token):
                          json=pay_data, headers=auth_headers(token))
     assert resp.status_code in [200, 400]
 
+
+# -------------------- GAS --------------------
+
+def test_gas_bill(token):
+    """Generate Gas bill"""
+    resp = requests.post(f"{BASE_URL}/gas/bill",
+                         json={"state": "Karnataka", "provider": "Indane"},
+                         headers=auth_headers(token))
+    assert resp.status_code == 200
+    data = resp.json()
+    global gas_service_no
+    gas_service_no = data.get("ServiceNo")
+    assert "bill_amount" in data
+
+
+def test_gas_pay(token):
+    global gas_service_no
+
+    pay_data = {
+        "service_no": gas_service_no,
+        "bill_amount": 290.0,
+        "mobile": "9876543210",
+        "state": "Karnataka",
+        "provider": "Indane",
+        "mpin": "1234"
+    }
+    resp = requests.post(f"{BASE_URL}/gas/pay",
+                         json=pay_data, headers=auth_headers(token))
+    assert resp.status_code in [200, 400]
+
+
+# -------------------- WATER --------------------
+def test_water_bill(token):
+    """Generate Water bill"""
+    resp = requests.post(f"{BASE_URL}/water/bill",
+                         json={"city": "Mumbai", "provider": "BMC Water"},
+                         headers=auth_headers(token))
+    assert resp.status_code == 200
+    data = resp.json()
+    global water_service_no
+    water_service_no = data.get("ServiceNo")
+    assert "bill_amount" in data
+
+
+def test_water_pay(token):
+    global water_service_no
+
+    pay_data = {
+        "service_no": water_service_no,
+        "bill_amount": 180.0,
+        "mobile": "9876543210",
+        "state": "Maharashtra",
+        "provider": "BMC",
+        "mpin": "1234"
+    }
+    resp = requests.post(f"{BASE_URL}/water/pay",
+                         json=pay_data, headers=auth_headers(token))
+    assert resp.status_code in [200, 400]
+
+
+# -------------------- LOAN REPAYMENT --------------------
+
+def test_loanrepayment_bill(token):
+    """Generate Loan Repayment bill"""
+    resp = requests.post(f"{BASE_URL}/loanrepayment/bill",
+                         json={"provider": "HDFC"},
+                         headers=auth_headers(token))
+    assert resp.status_code == 200
+    data = resp.json()
+    global loan_service_no
+    loan_service_no = data.get("ServiceNo")
+    assert "bill_amount" in data
+
+
+def test_loanrepayment_pay(token):
+    global loan_service_no
+
+    pay_data = {
+        "service_no": loan_service_no,
+        "bill_amount": 500.0,
+        "mobile": "9876543210",
+        "provider": "HDFC Bank",
+        "mpin": "1234"
+    }
+    resp = requests.post(f"{BASE_URL}/loanrepayment/pay",
+                         json=pay_data, headers=auth_headers(token))
+    assert resp.status_code in [200, 400]
+
+
+# -------------------- FASTTAG --------------------
+
+def test_fasttag_bill(token):
+    """Generate FastTag bill"""
+    resp = requests.post(f"{BASE_URL}/fasttag/bill",
+                         json={"provider": "ICICI FastTag"},
+                         headers=auth_headers(token))
+    assert resp.status_code == 200
+    data = resp.json()
+    global fasttag_service_no
+    fasttag_service_no = data.get("ServiceNo")
+    assert "bill_amount" in data
+
+
+def test_fasttag_pay(token):
+    global fasttag_service_no
+
+    pay_data = {
+        "service_no": fasttag_service_no,
+        "bill_amount": 350.0,
+        "mobile": "9876543210",
+        "provider": "ICICI FastTag",
+        "mpin": "1234"
+    }
+    resp = requests.post(f"{BASE_URL}/fasttag/pay",
+                         json=pay_data, headers=auth_headers(token))
+    assert resp.status_code in [200, 400]
 
 # -------------------- LOGOUT --------------------
 
