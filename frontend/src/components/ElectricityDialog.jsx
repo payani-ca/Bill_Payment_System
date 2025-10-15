@@ -1,4 +1,3 @@
-// src/components/ElectricityDialog.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
@@ -6,6 +5,7 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Grid,
   Box,
   Typography,
   CircularProgress,
@@ -19,13 +19,11 @@ import {
   Autocomplete,
   IconButton,
   Chip,
-  Stack,
 } from "@mui/material";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import CloseIcon from "@mui/icons-material/Close";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "../auth/AuthProvider";
 
 const ELECTRICITY_MAP = {
   "Andhra Pradesh": ["APEPDCL", "APSPDCL"],
@@ -54,8 +52,6 @@ const ELECTRICITY_MAP = {
 };
 
 export default function ElectricityDialog({ open, onClose }) {
-  const { user, fetchWithAuth } = useAuth();
-
   const [state, setState] = useState("");
   const [provider, setProvider] = useState("");
   const [serviceNo, setServiceNo] = useState("");
@@ -65,7 +61,7 @@ export default function ElectricityDialog({ open, onClose }) {
   const [loadingWallet, setLoadingWallet] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [walletBalance, setWalletBalance] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(5000);
 
   const states = useMemo(() => Object.keys(ELECTRICITY_MAP), []);
 
@@ -78,24 +74,8 @@ export default function ElectricityDialog({ open, onClose }) {
       setMpin("");
       setError(null);
       setSuccess(null);
-    } else {
-      fetchWalletBalance();
     }
   }, [open]);
-
-  const fetchWalletBalance = async () => {
-    if (!user?.UserID) return;
-    setLoadingWallet(true);
-    try {
-      const res = await fetchWithAuth(`/wallets/${user.UserID}`, { method: "GET" });
-      const data = res.data || {};
-      setWalletBalance(data.Amount ?? null);
-    } catch {
-      setWalletBalance(null);
-    } finally {
-      setLoadingWallet(false);
-    }
-  };
 
   const providerOptions = state ? ELECTRICITY_MAP[state] : [];
 
@@ -106,20 +86,11 @@ export default function ElectricityDialog({ open, onClose }) {
     if (!provider) return setError("Please select a provider.");
 
     setLoading(true);
-    try {
-      const res = await fetchWithAuth("/electricity/bill", {
-        method: "POST",
-        data: { state, provider },
-      });
-      const data = res.data;
-      setBillAmount(data.bill_amount);
-      if (data.ServiceNo) setServiceNo(data.ServiceNo);
-    } catch (err) {
-      setError(err?.response?.data?.msg || "Failed to fetch bill.");
-      setBillAmount(null);
-    } finally {
+    setTimeout(() => {
+      setBillAmount(1250);
+      setServiceNo(serviceNo || "SERV" + Math.floor(Math.random() * 100000));
       setLoading(false);
-    }
+    }, 1000);
   };
 
   const pay = async () => {
@@ -130,45 +101,17 @@ export default function ElectricityDialog({ open, onClose }) {
     if (!/^\d{4}$/.test(mpin)) return setError("Enter a valid 4-digit MPIN.");
 
     setLoading(true);
-    try {
-      const payload = {
-        state,
-        provider,
-        mobile: user?.Mobile || "",
-        bill_amount: billAmount,
-        mpin,
-        service_no: serviceNo,
-      };
-      const res = await fetchWithAuth("/electricity/pay", {
-        method: "POST",
-        data: payload,
-      });
-      const data = res.data;
-      let msg = data.msg || "Payment successful.";
-      if (data.new_balance !== undefined) msg += ` New balance: ₹ ${data.new_balance}`;
-      setSuccess(msg);
+    setTimeout(() => {
+      const newBalance = walletBalance - billAmount;
+      setSuccess(`Payment successful. New balance: ₹ ${newBalance}`);
+      setWalletBalance(newBalance);
       setMpin("");
-      setWalletBalance(data.new_balance ?? walletBalance);
-    } catch (err) {
-      setError(err?.response?.data?.msg || "Payment failed.");
-    } finally {
       setLoading(false);
-    }
+    }, 1500);
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      fullWidth 
-      maxWidth="md"
-      PaperProps={{
-        sx: {
-          borderRadius: 2,
-          minHeight: '600px',
-        }
-      }}
-    >
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle
         sx={{
           display: "flex",
@@ -176,6 +119,7 @@ export default function ElectricityDialog({ open, onClose }) {
           justifyContent: "space-between",
           bgcolor: "#f9fbff",
           borderBottom: "1px solid #eaeaea",
+          pb: 2,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -205,20 +149,25 @@ export default function ElectricityDialog({ open, onClose }) {
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 3, pb: 3, px: 4 }}>
-        <Stack spacing={3}>
+      <DialogContent sx={{ mt: 3, px: 3 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
           {/* State Select */}
-          <FormControl fullWidth>
-            <InputLabel id="state-label">State</InputLabel>
+          <FormControl fullWidth size="small">
+            <InputLabel>State</InputLabel>
             <Select
-              labelId="state-label"
-              id="state-select"
               value={state}
-              label="Statc,cm,ce"
+              label="State"
               onChange={(e) => {
                 setState(e.target.value);
                 setProvider("");
                 setBillAmount(null);
+              }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 300,
+                  },
+                },
               }}
             >
               {states.map((s) => (
@@ -231,29 +180,35 @@ export default function ElectricityDialog({ open, onClose }) {
 
           {/* Provider Autocomplete */}
           <Autocomplete
-            fullWidth
             options={providerOptions}
             value={provider || null}
             onChange={(e, val) => {
               setProvider(val || "");
               setBillAmount(null);
             }}
-            disabled={!state}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Service Provider"
+                size="small"
+                fullWidth
               />
             )}
+            disabled={!state}
+            fullWidth
+            ListboxProps={{
+              style: { maxHeight: 250 },
+            }}
           />
 
           {/* Service Number */}
           <TextField
-            fullWidth
             label="Service No."
             value={serviceNo}
             onChange={(e) => setServiceNo(e.target.value)}
-            helperText="cscsd blank if system should generate automatically."
+            size="small"
+            fullWidth
+            helperText="Leave blank if system should generate automatically."
           />
 
           {/* Fetch Bill Button */}
@@ -263,45 +218,37 @@ export default function ElectricityDialog({ open, onClose }) {
             color="warning"
             onClick={fetchBill}
             disabled={loading || !provider}
-            sx={{ py: 1.8, fontWeight: 600, textTransform: 'none', fontSize: '1.1rem' }}
+            sx={{ py: 1.2, fontWeight: 700 }}
+            startIcon={loading && <CircularProgress size={16} color="inherit" />}
           >
-            {loading ? (
-              <>
-                <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
-                Fetching...
-              </>
-            ) : (
-              "Fetch Bill"
-            )}
+            {loading ? "Fetching..." : "Fetch Bill"}
           </Button>
 
           {/* Bill Amount Display */}
           <AnimatePresence>
             {billAmount !== null && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
               >
                 <Paper
-                  elevation={0}
                   sx={{
-                    p: 4,
+                    p: 2.5,
                     textAlign: "center",
-                    borderRadius: 3,
+                    borderRadius: 2,
                     bgcolor: "#f4faf7",
-                    border: "2px solid #e0f0e6",
+                    border: "1px solid #e0f0e6",
                   }}
                 >
-                  <Typography variant="body2" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1.5, mb: 1 }}>
+                  <Typography variant="subtitle2" color="text.secondary">
                     Bill Amount
                   </Typography>
-                  <Typography variant="h2" fontWeight={700} color="success.main" sx={{ my: 2 }}>
+                  <Typography variant="h4" fontWeight={800} color="success.main" sx={{ my: 0.5 }}>
                     ₹ {billAmount}
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    {provider} • {state}
+                  <Typography variant="body2" color="text.secondary">
+                    {provider} ({state})
                   </Typography>
                 </Paper>
               </motion.div>
@@ -310,18 +257,15 @@ export default function ElectricityDialog({ open, onClose }) {
 
           {/* MPIN */}
           <TextField
-            fullWidth
             label="MPIN (4 digits)"
-            type="password"
             value={mpin}
             onChange={(e) =>
               setMpin(e.target.value.replace(/\D/g, "").slice(0, 4))
             }
-            inputProps={{ 
-              inputMode: "numeric", 
-              maxLength: 4,
-              autoComplete: "off"
-            }}
+            inputProps={{ inputMode: "numeric", maxLength: 4 }}
+            fullWidth
+            size="small"
+            type="password"
           />
 
           {/* Pay Button */}
@@ -331,34 +275,20 @@ export default function ElectricityDialog({ open, onClose }) {
             color="success"
             onClick={pay}
             disabled={!billAmount || loading || !mpin}
-            sx={{ py: 1.8, fontWeight: 600, textTransform: 'none', fontSize: '1.1rem' }}
+            sx={{ py: 1.2, fontWeight: 700 }}
+            startIcon={loading && <CircularProgress size={16} color="inherit" />}
           >
-            {loading ? (
-              <>
-                <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
-                Processing...
-              </>
-            ) : (
-              "Pay from Wallet"
-            )}
+            {loading ? "Processing..." : "Pay from Wallet"}
           </Button>
 
           {/* Alerts */}
-          {error && (
-            <Alert severity="error" onClose={() => setError(null)}>
-              {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert severity="success" onClose={() => setSuccess(null)}>
-              {success}
-            </Alert>
-          )}
-        </Stack>
+          {error && <Alert severity="error">{error}</Alert>}
+          {success && <Alert severity="success">{success}</Alert>}
+        </Box>
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} color="inherit" sx={{ textTransform: 'none' }}>
+        <Button onClick={onClose} color="inherit">
           Close
         </Button>
       </DialogActions>
