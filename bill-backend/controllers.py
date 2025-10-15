@@ -73,20 +73,34 @@ def init_routes(app):
     @app.route("/register", methods=["POST"])
     def register():
         data = request.get_json(force=True)
-        required = ["name", "password", "mobile", "dob", "city", "country", "mpin"]
+        required = ["name", "password", "mobile", "dob", "city", "country", "mpin", "pan", "aadhar"]
+
+        # Check for missing fields
         if not all(k in data for k in required):
             return jsonify({"msg": "Missing fields"}), 400
 
+        # Validate mobile number
         if not validate_mobile(data["mobile"]):
             return jsonify({"msg": "Invalid mobile"}), 400
 
+        # Validate PAN format (e.g. ABCDE1234F)
+        pan_pattern = r"^[A-Z]{5}[0-9]{4}[A-Z]{1}$"
+        if not re.match(pan_pattern, data["pan"].upper()):
+            return jsonify({"msg": "Invalid PAN format"}), 400
+
+        # Validate Aadhaar format (12 digits)
+        aadhar_pattern = r"^\d{12}$"
+        if not re.match(aadhar_pattern, data["aadhar"]):
+            return jsonify({"msg": "Invalid Aadhaar number"}), 400
+
+        # Check for existing mobile number
         if users_col.find_one({"Mobile": data["mobile"]}):
             return jsonify({"msg": "Mobile already registered"}), 409
 
         user_id = data["userID"]
         current_time = datetime.now()
 
-        # **FIX**: Manually create the user dictionary to ensure key names match queries.
+        # Create user document
         user_doc = {
             "UserID": user_id,
             "Name": data["name"],
@@ -95,13 +109,15 @@ def init_routes(app):
             "DOB": data["dob"],
             "City": data["city"],
             "Country": data["country"],
-            "role": "user",  # Default role
+            "PAN": data["pan"].upper(),
+            "Aadhaar": data["aadhar"],
+            "role": "user",
             "CreatedOn": current_time,
-            "LastModified": current_time
+            "LastModified": current_time,
         }
         users_col.insert_one(user_doc)
 
-        # **FIX**: Manually create the wallet dictionary for consistency.
+        # Create wallet document
         wallet_doc = {
             "WalletID": str(uuid.uuid4()),
             "UserID": user_id,
@@ -109,11 +125,11 @@ def init_routes(app):
             "MPIN": hash_password(data["mpin"]),
             "Transaction": [],
             "CreatedOn": current_time,
-            "LastModified": current_time
+            "LastModified": current_time,
         }
         wallets_col.insert_one(wallet_doc)
 
-        return jsonify({"msg": "User registered", "user_id": user_id}), 201
+        return jsonify({"msg": "User registered successfully", "user_id": user_id}), 201
 
     # ------------------ Login ------------------
     @app.route("/login", methods=["POST"])

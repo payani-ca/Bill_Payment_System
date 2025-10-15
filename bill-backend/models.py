@@ -31,7 +31,7 @@ class BaseModel:
 
 # ------------------ User ------------------
 class User(BaseModel):
-    def __init__(self, userID, name, password, mobile, dob, city, country, country_code="+91", wallet_balance=0.0, role="user"):
+    def __init__(self, userID, name, password, mobile, dob, city, pan, aadhar, country, country_code="+91", wallet_balance=0.0, role="user"):
         super().__init__()
         self._id = str(uuid.uuid4())           # internal MongoDB _id
         self.UserID = userID       # custom alphanumeric
@@ -41,6 +41,8 @@ class User(BaseModel):
         self.dob = dob
         self.city = city
         self.country = country
+        self.pan = pan,
+        self.aadhar = aadhar
         self.country_code = country_code
         self.wallet_balance = wallet_balance
         self.role = role
