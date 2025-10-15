@@ -10,7 +10,7 @@ pip install -r requirements.txt
 
 
 
-#Backend Endpoints:
+# Backend Endpoints:
 POST
 http://localhost:5000/register
 {
@@ -43,9 +43,71 @@ http://localhost:5000/logout
 add access tokens in auth headers
 
 
+# To get service# for electricity
+POST
+http://localhost:5000/electricity/service_no
+{
+  "state": "Tamil Nadu",
+  "provider": "TNEB"
+}
 
+POST
+http://localhost:5000/recharge/service_no
+{
+  "provider": "Airtel"
+}
 
+POST
+http://localhost:5000/dth/service_no
+{
+  "provider": "Airtel DTH"
+}
 
+POST
+http://localhost:5000/creditcard/service_no
+{
+  "provider": "SBI Card"
+}
+
+# bills endpoint to fetch amount to be paid
+POST
+http://localhost:5000/electricity/bill
+{
+  "state": "Tamil Nadu",
+  "provider": "TNEB"
+}
+
+POST
+http://localhost:5000/recharge/bill
+{
+  "provider": "Airtel"
+}
+
+POST
+http://localhost:5000/dth/bill
+{
+  "provider": "Airtel DTH"
+}
+
+POST
+http://localhost:5000/creditcard/bill
+{
+  "provider": "SBI Card"
+}
+
+# endpoints for payment
+
+POST
+http://localhost:5000/creditcard/pay
+{
+    "service_no": "C-833-609-838-490",
+    "bill_amount": 277.0,
+    "mobile":"9876543210",
+  "state": "Tamil Nadu",
+  "provider": "SBI Card",
+  "mpin":"1234",
+  "card_number": 15655276562625
+}
 
 #Prasad
 Electricity:

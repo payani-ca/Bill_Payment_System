@@ -21,17 +21,17 @@ def get_bill():
 
     if not provider or provider not in UTILITIES["recharge"]:
         return jsonify({"msg": "Invalid provider"}), 400
-    service_no = data.get("ServiceNo")
+    #service_no = data.get("ServiceNo")
     today = datetime.now().strftime("%Y-%m-%d")
     service_no = f"R-{sum_ascii('recharge')}-{sum_ascii(provider)}-{sum_ascii(user_id)}-{sum_ascii(today)}"
 
 
 
-    expected_service_no = f"R-{sum_ascii('recharge')}-{sum_ascii(provider)}-{sum_ascii(user_id)}-{sum_ascii(today)}"
-
-    # Validate ServiceNo
-    if service_no != expected_service_no:
-        return jsonify({"msg": "Invalid ServiceNo"}), 400
+    # expected_service_no = f"R-{sum_ascii('recharge')}-{sum_ascii(provider)}-{sum_ascii(user_id)}-{sum_ascii(today)}"
+    #
+    # # Validate ServiceNo
+    # if service_no != expected_service_no:
+    #     return jsonify({"msg": "Invalid ServiceNo"}), 400
 
 
     today = datetime.now().strftime("%Y-%m-%d")

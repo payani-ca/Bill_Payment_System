@@ -21,18 +21,18 @@ def generate_bill():
     user_id = get_jwt_identity()
     state = data.get("state")
     provider = data.get("provider")
-    ServiceNo =  data.get("ServiceNo")
+    #ServiceNo =  data.get("ServiceNo")
     today = datetime.now().strftime("%Y-%m-%d")
     service_no = f"E-{sum_ascii('electricity')}-{sum_ascii(provider)}-{sum_ascii(user_id)}-{sum_ascii(today)}"
 
     if not state or not provider:
         return jsonify({"msg": "Missing state or provider"}), 400
 
-    expected_service_no = f"E-{sum_ascii('electricity')}-{sum_ascii(data['provider'])}-{sum_ascii(user_id)}-{sum_ascii(today)}"
-
-    # Validate ServiceNo
-    if service_no != expected_service_no:
-        return jsonify({"msg": "Invalid ServiceNo"}), 400
+    # expected_service_no = f"E-{sum_ascii('electricity')}-{sum_ascii(data['provider'])}-{sum_ascii(user_id)}-{sum_ascii(today)}"
+    #
+    # # Validate ServiceNo
+    # if service_no != expected_service_no:
+    #     return jsonify({"msg": "Invalid ServiceNo"}), 400
 
     # Verify provider exists in our constants
     valid_states = UTILITIES["electricity"]
