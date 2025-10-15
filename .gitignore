@@ -184,10 +184,7 @@ instance/
 .env.*
 !example.env  # keep example if needed
 
-# MongoDB dump or local data
-dump/
-*.bson
-*.json
+
 
 # Log files
 *.log
