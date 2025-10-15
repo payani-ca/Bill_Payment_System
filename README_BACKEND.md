@@ -93,6 +93,65 @@ res:
     "bill_amount": 294.1,
     "userID": "capayani"
 }
+
+# ############################################
+POST
+http://127.0.0.1:5000/water/bill
+{
+  "city": "Mumbai",
+  "provider": "BMC Water"
+}
+
+res:
+{
+    "ServiceNo": "W-547-757-838-490",
+    "bill_amount": 263.2,
+    "userID": "capayani"
+}
+
+POST
+http://127.0.0.1:5000/gas/bill
+{
+  "state": "Karnataka",
+  "provider": "Indane"
+}
+
+res:
+{
+    "ServiceNo": "G-315-591-838-490",
+    "bill_amount": 223.4,
+    "userID": "capayani"
+}
+
+POST
+http://127.0.0.1:5000/fasttag/bill
+{
+    "provider": "ICICI FastTag"
+}
+
+res:
+{
+    "ServiceNo": "F-746-1067-838-490",
+    "bill_amount": 314.1,
+    "userID": "capayani"
+}
+
+POST
+http://127.0.0.1:5000/loanrepayment/bill
+{
+  "provider": "HDFC"
+}
+
+res:
+{
+    "ServiceNo": "L-426-277-838-490",
+    "bill_amount": 203.1,
+    "userID": "capayani"
+}
+
+
+
+
 # endpoints for payment
 
 POST
@@ -166,6 +225,79 @@ Res:
     "vendor": "Electricity : Tamil Nadu : TANGEDCO"
 }
 
-#Prasad
 Electricity:
 service_no = f"E-{sum_ascii('electricity')}-{sum_ascii(provider)}-{sum_ascii(user_id)}-{sum_ascii(today)}"
+
+# #########################
+
+POST
+http://127.0.0.1:5000/water/pay
+{
+  "city": "Mumbai",
+  "provider": "BMC Water",
+  "mobile": "9876543210",
+  "bill_amount": 263.2,
+  "mpin": "1234",
+  "service_no": "W-547-757-838-490"
+}
+
+res:
+{
+    "msg": "Water bill payment successful",
+    "new_balance": 395.7,
+    "vendor": "Water : Mumbai : BMC Water"
+}
+
+
+POST
+http://127.0.0.1:5000/gas/pay
+{
+    "state": "Karnataka",
+    "provider": "Indane",
+    "mobile": "9876543210",
+    "bill_amount": 199.3,
+    "mpin": "1234",
+    "service_no": "G-315-591-597-490"
+}
+
+res:
+{
+    "msg": "Gas bill payment successful",
+    "new_balance": 196.39999999999998,
+    "vendor": "Gas : Karnataka : Indane"
+}
+
+
+POST
+http://127.0.0.1:5000/fasttag/pay
+{
+    "provider": "ICICI FastTag",
+    "mobile": "9876543210",
+    "bill_amount": 314.1,
+    "mpin": "1234",
+    "service_no": "F-746-1067-838-490"
+}
+
+res:
+{
+    "msg": "FastTag payment successful",
+    "new_balance": 685.9,
+    "vendor": "FastTag : ICICI FastTag"
+}
+
+POST
+http://127.0.0.1:5000/loanrepayment/pay
+{
+  "provider": "HDFC",
+  "mobile": "9876543210",
+  "bill_amount":203.1,
+  "mpin": "1234",                    
+  "service_no": "L-426-277-838-490"
+}
+
+res:
+{
+    "msg": "Loan repayment successful",
+    "new_balance": 482.79999999999995,
+    "vendor": "Loan : HDFC"
+}
