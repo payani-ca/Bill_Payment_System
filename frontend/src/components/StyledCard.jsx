@@ -1,13 +1,8 @@
+// src/components/StyledCard.jsx
 import React from 'react'
 import { Card, CardActionArea, CardMedia, CardContent, Typography } from '@mui/material'
 
-/**
- * Props:
- *  - image (string): path or URL to the image
- *  - title (string): main title text
- *  - subtitle (string): smaller description text
- */
-export default function StyledCard({ image, title, subtitle }) {
+export default function StyledCard({ image, title, subtitle, onClick }) {
   return (
     <Card
       sx={{
@@ -17,18 +12,20 @@ export default function StyledCard({ image, title, subtitle }) {
         boxShadow: '0px 6px 20px rgba(2,6,23,0.08)',
         transition: 'transform 0.28s ease, box-shadow 0.28s ease',
         '&:hover': {
-          transform: 'translateY(-8px)',
-          boxShadow: '0px 12px 36px rgba(2,6,23,0.16)',
+          transform: onClick ? 'translateY(-8px)' : undefined,
+          boxShadow: onClick ? '0px 12px 36px rgba(2,6,23,0.16)' : undefined,
         },
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
         backgroundColor: '#ffffff',
+        cursor: onClick ? 'pointer' : 'default',
       }}
       role="article"
       aria-label={title}
     >
       <CardActionArea
+        onClick={onClick}
         sx={{
           display: 'flex',
           flexDirection: 'column',
