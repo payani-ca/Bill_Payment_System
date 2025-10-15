@@ -63,7 +63,7 @@ def role_required(allowed_roles):
 
     return decorator
 
-
+#change
 # ------------------ Initialize Routes ------------------
 def init_routes(app):
     global jwt
@@ -101,7 +101,7 @@ def init_routes(app):
         current_time = datetime.now()
 
         # Create user document
-        user_doc = {
+        user_doc =  {
             "UserID": user_id,
             "Name": data["name"],
             "Password": hash_password(data["password"]),
@@ -143,7 +143,6 @@ def init_routes(app):
 
         user = users_col.find_one({"Mobile": mobile})
 
-        # Check if user exists and password is correct in one step
         if not user or not check_password(password, user["Password"]):
             return jsonify({"msg": "Invalid mobile or password"}), 401
 
@@ -152,10 +151,31 @@ def init_routes(app):
         access_token = create_access_token(identity=identity, additional_claims=additional_claims)
         refresh_token = create_refresh_token(identity=identity, additional_claims=additional_claims)
 
+        # Fetch wallet balance
+        wallet_doc = wallets_col.find_one({"UserID": identity})
+        wallet_balance = wallet_doc["Amount"] if wallet_doc else 0.0
+
+        # Fetch all transactions for this user
+        user_transactions = list(transactions_col.find(
+            {"UserID": identity},
+            {"_id": 0}  # exclude MongoDB internal _id
+        ))
+
         return jsonify({
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "user": {"UserID": identity, "Name": user.get("Name"), "role": user.get("role")}
+            "user": {
+                "UserID": identity,
+                "Name": user.get("Name"),
+                "role": user.get("role"),
+                "Mobile": user.get("Mobile"),
+                "City": user.get("City"),
+                "Country": user.get("Country"),
+                "PAN": user.get("PAN"),
+                "Aadhaar": user.get("Aadhaar"),
+                "wallet_balance": wallet_balance,
+                "bills": user_transactions
+            }
         }), 200
 
     # ------------------ Logout ------------------
