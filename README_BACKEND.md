@@ -27,7 +27,7 @@ http://localhost:5000/register
   "wallet_balance": 1000
 }
 
-POST
+POST 
 http://localhost:5000/login
 {
    
@@ -48,3 +48,5 @@ add access tokens in auth headers
 
 
 #Prasad
+Electricity:
+service_no = f"E-{sum_ascii('electricity')}-{sum_ascii(provider)}-{sum_ascii(user_id)}-{sum_ascii(today)}"

@@ -3,6 +3,10 @@ from flask import Flask
 from seed_data import create_seed_data
 import os
 import secrets
+from electricity import electricity_bp
+from recharge import recharge_bp
+from dth import dth_bp
+from creditcard import credit_bp
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -16,6 +20,11 @@ with app.app_context():
 
 from controllers import init_routes
 init_routes(app)
+# ---- Register Blueprints ----
+app.register_blueprint(electricity_bp)
+app.register_blueprint(recharge_bp)
+app.register_blueprint(dth_bp)
+app.register_blueprint(credit_bp)
 
 @app.route("/")
 def index():

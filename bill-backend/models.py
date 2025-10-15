@@ -61,7 +61,7 @@ class Wallet(BaseModel):
 
 # ------------------ Transaction ------------------
 class Transaction(BaseModel):
-    def __init__(self, user_id, amount, spent_on="Misc", vendor_details=""):
+    def __init__(self, user_id, amount, ServiceNo, status, spent_on="Misc", vendor_details="" ):
         super().__init__()
         self.TxID = generate_tx_id()
         self.Amount = amount
@@ -70,6 +70,8 @@ class Transaction(BaseModel):
         self.Time = datetime.now().time()
         self.UserID = user_id
         self.VendorDetails = vendor_details
+        self.ServiceNo = ServiceNo
+        self.Status = status
 
 # ------------------ Utilities (Parent Class) ------------------
 class Utility(BaseModel):
