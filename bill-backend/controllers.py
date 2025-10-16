@@ -392,3 +392,21 @@ def init_routes(app):
         except Exception as e:
             return jsonify({"msg": "Error generating analysis", "error": str(e)}), 500
 
+    @app.route("/bills", methods=["GET"])
+    @jwt_required()
+    def getbills():
+        user_id = get_jwt_identity()
+
+        wallet_doc = wallets_col.find_one({"UserID": user_id})
+        transactions = list(transactions_col.find({"UserID": user_id}, {"_id": 0}))
+
+
+        if not transactions:
+            return jsonify({"msg": "No transactions found for user"}), 404
+
+        return jsonify({
+                "user_id": user_id,
+
+                "transactions": transactions
+            }), 200
+
