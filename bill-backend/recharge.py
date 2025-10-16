@@ -5,7 +5,7 @@ from controllers import wallets_col, transactions_col, check_password
 from constants.utilitiesconst import UTILITIES
 import uuid
 
-recharge_bp = Blueprint("recharge", __name__, url_prefix="/recharge")
+recharge_bp = Blueprint("recharge", __name__, url_prefix="/api/recharge")
 
 
 def sum_ascii(s):

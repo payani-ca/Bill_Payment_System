@@ -5,7 +5,7 @@ import uuid
 from constants.utilitiesconst import UTILITIES
 from controllers import wallets_col, transactions_col, utilities_col, check_password
 
-credit_bp = Blueprint("credit_bp", __name__, url_prefix="/creditcard")
+credit_bp = Blueprint("credit_bp", __name__, url_prefix="/api/creditcard")
 
 def sum_ascii(text):
     return sum(ord(ch) for ch in str(text))

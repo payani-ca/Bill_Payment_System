@@ -62,7 +62,7 @@ export default function FastTagDialog({ open, onClose }) {
     setSuccess(null);
     setLoading(true);
     try {
-      const res = await fetchWithAuth("/fasttag/bill", {
+      const res = await fetchWithAuth("/api/fasttag/bill", {
         method: "POST",
         data: { provider }
       });
@@ -92,7 +92,7 @@ export default function FastTagDialog({ open, onClose }) {
         mpin,
         service_no: serviceNo
       };
-      const res = await fetchWithAuth("/fasttag/pay", { method: "POST", data: payload });
+      const res = await fetchWithAuth("/api/fasttag/pay", { method: "POST", data: payload });
       setSuccess(`Payment successful! New balance: ₹ ${res.data.new_balance}`);
       setWalletBalance(res.data.new_balance);
       setMpin("");

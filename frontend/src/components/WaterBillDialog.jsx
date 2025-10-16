@@ -79,7 +79,7 @@ export default function WaterBillDialog({ open, onClose }) {
     if (!user?.UserID) return;
     setLoadingWallet(true);
     try {
-      const res = await fetchWithAuth(`/wallets/${user.UserID}`, { method: "GET" });
+      const res = await fetchWithAuth(`/api/wallets/${user.UserID}`, { method: "GET" });
       const data = res.data || {};
       setWalletBalance(data.Amount ?? null);
     } catch {
@@ -99,7 +99,7 @@ export default function WaterBillDialog({ open, onClose }) {
 
     setLoading(true);
     try {
-      const res = await fetchWithAuth("/water/bill", {
+      const res = await fetchWithAuth("/api/water/bill", {
         method: "POST",
         data: { city, provider },
       });
@@ -131,7 +131,7 @@ export default function WaterBillDialog({ open, onClose }) {
         mpin,
         service_no: serviceNo,
       };
-      const res = await fetchWithAuth("/water/pay", {
+      const res = await fetchWithAuth("/api/water/pay", {
         method: "POST",
         data: payload,
       });

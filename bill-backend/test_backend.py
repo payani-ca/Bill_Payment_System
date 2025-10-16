@@ -2,6 +2,7 @@ import pytest
 import requests
 
 BASE_URL = "http://localhost:5000"
+#APP_BASE_URL=http://localhost:3000
 
 recharge_service_no = ""
 dth_service_no = ""

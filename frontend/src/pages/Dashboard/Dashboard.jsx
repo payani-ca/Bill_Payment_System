@@ -22,7 +22,7 @@ export default function Dashboard() {
 
         // Wallet
         try {
-          const wRes = await axiosClient.get(`/wallets/${userID}`, { headers: { Authorization: `Bearer ${accessToken}` } })
+          const wRes = await axiosClient.get(`/api/wallets/${userID}`, { headers: { Authorization: `Bearer ${accessToken}` } })
           setWallet(wRes.data)
         } catch (e) {
           setWallet({

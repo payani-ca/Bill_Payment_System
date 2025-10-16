@@ -75,7 +75,7 @@ export default function GasBillDialog({ open, onClose }) {
     if (!user?.UserID) return;
     setLoadingWallet(true);
     try {
-      const res = await fetchWithAuth(`/wallets/${user.UserID}`, { method: "GET" });
+      const res = await fetchWithAuth(`/api/wallets/${user.UserID}`, { method: "GET" });
       setWalletBalance(res.data?.Amount ?? null);
     } catch {
       setWalletBalance(null);
@@ -90,7 +90,7 @@ export default function GasBillDialog({ open, onClose }) {
     setSuccess(null);
     setLoading(true);
     try {
-      const res = await fetchWithAuth("/gas/bill", {
+      const res = await fetchWithAuth("/api/gas/bill", {
         method: "POST",
         data: { state, provider },
       });
@@ -120,7 +120,7 @@ export default function GasBillDialog({ open, onClose }) {
         mpin,
         service_no: serviceNo,
       };
-      const res = await fetchWithAuth("/gas/pay", { method: "POST", data: payload });
+      const res = await fetchWithAuth("/api/gas/pay", { method: "POST", data: payload });
       setSuccess(`Payment successful! New balance: ₹ ${res.data.new_balance}`);
       setWalletBalance(res.data.new_balance);
       setMpin("");

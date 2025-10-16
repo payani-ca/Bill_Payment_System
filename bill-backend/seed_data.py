@@ -5,10 +5,12 @@ from datetime import datetime, timedelta
 from pymongo import MongoClient
 from constants.utilitiesconst import UTILITIES
 import uuid
+import os
 
 # MongoDB setup
-client = MongoClient("mongodb://localhost:27017/")
-db = client["billingsystem"]
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://mongo:27017/billingsystem")
+client = MongoClient(MONGO_URL)
+db = client['billingsystem']
 
 def random_mobile():
     return f"9{random.randint(100000000, 999999999)}"

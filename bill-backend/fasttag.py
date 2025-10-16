@@ -5,7 +5,7 @@ from controllers import wallets_col, transactions_col, check_password
 from constants.utilitiesconst import UTILITIES
 import uuid
 
-fasttag_bp = Blueprint("fasttag", __name__, url_prefix="/fasttag")
+fasttag_bp = Blueprint("fasttag", __name__, url_prefix="/api/fasttag")
 
 # --- Helper ---
 def sum_ascii(s):

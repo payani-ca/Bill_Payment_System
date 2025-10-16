@@ -67,7 +67,7 @@ export default function MobileRechargeDialog({ open, onClose }) {
     if (!user?.UserID) return;
     setLoadingWallet(true);
     try {
-      const res = await fetchWithAuth(`/wallets/${user.UserID}`, { method: "GET" });
+      const res = await fetchWithAuth(`/api/wallets/${user.UserID}`, { method: "GET" });
       const data = res.data || {};
       setWalletBalance(data.Amount ?? null);
     } catch {
@@ -84,7 +84,7 @@ export default function MobileRechargeDialog({ open, onClose }) {
 
     setLoading(true);
     try {
-      const res = await fetchWithAuth("/recharge/bill", {
+      const res = await fetchWithAuth("/api/recharge/bill", {
         method: "POST",
         data: { provider },
       });
@@ -115,7 +115,7 @@ export default function MobileRechargeDialog({ open, onClose }) {
         mpin,
         service_no: serviceNo,
       };
-      const res = await fetchWithAuth("/recharge/pay", {
+      const res = await fetchWithAuth("/api/recharge/pay", {
         method: "POST",
         data: payload,
       });

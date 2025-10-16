@@ -33,7 +33,7 @@ export function AuthProvider({ children }) {
   const login = async ({ mobile, password }) => {
     setLoading(true)
     try {
-      const res = await axiosClient.post('/login', { mobile, password })
+      const res = await axiosClient.post('/api/login', { mobile, password })
       const data = res.data
       setAccessToken(data.access_token)
       setUser(data.user)
@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       // attempt to revoke on server (optional). ignore errors.
-      await axiosClient.post('/logout', {}, { headers: { Authorization: `Bearer ${accessToken}` } })
+      await axiosClient.post('/api/logout', {}, { headers: { Authorization: `Bearer ${accessToken}` } })
     } catch (e) {
       // ignore network/server errors on logout
     }

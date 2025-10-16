@@ -5,7 +5,7 @@ from controllers import wallets_col, transactions_col, check_password
 from constants.utilitiesconst import UTILITIES
 import uuid
 
-electricity_bp = Blueprint("electricity", __name__, url_prefix="/electricity")
+electricity_bp = Blueprint("electricity", __name__, url_prefix="/api/electricity")
 
 
 # --- Helper to compute amount ---

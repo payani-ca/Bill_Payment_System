@@ -140,7 +140,7 @@ export default function ElectricityDialog({ open, onClose }) {
 
     try {
       const payload = { state, provider };
-      const res = await fetchWithAuth("/electricity/bill", { method: "POST", data: payload });
+      const res = await fetchWithAuth("/api/electricity/bill", { method: "POST", data: payload });
       // backend returns { bill_amount, userID, ServiceNo }
       setBillAmount(res.data?.bill_amount ?? null);
       if (res.data?.ServiceNo) setServiceNo(res.data.ServiceNo);
@@ -157,7 +157,7 @@ export default function ElectricityDialog({ open, onClose }) {
   const generateServiceNo = async () => {
     if (!provider) return;
     try {
-      const res = await fetchWithAuth("/electricity/service_no", { method: "POST", data: { provider } });
+      const res = await fetchWithAuth("/api/electricity/service_no", { method: "POST", data: { provider } });
       if (res.data?.service_no) setServiceNo(res.data.service_no);
     } catch {
       // ignore if endpoint not supported
@@ -187,7 +187,7 @@ export default function ElectricityDialog({ open, onClose }) {
         mpin,
         service_no: serviceNo,
       };
-      const res = await fetchWithAuth("/electricity/pay", { method: "POST", data: payload });
+      const res = await fetchWithAuth("/api/electricity/pay", { method: "POST", data: payload });
       // backend returns { msg, vendor, new_balance }
       setSuccess(res.data?.msg ? `${res.data.msg}` : "Payment successful!");
       if (res.data?.new_balance !== undefined) setWalletBalance(res.data.new_balance);

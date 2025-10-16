@@ -1,31 +1,9 @@
-#Payani
 Install dependencies:
 
 pip install -r requirements.txt
 
 
 
-
-
-
-
-
-# Backend Endpoints:
-POST
-http://localhost:5000/register
-{
-    "userID":"capayani",
-  "name": "John Doe",
-  "password": "Pass123!",
-  "mobile": "9876543210",
-  "dob": "1990-01-01",
-  "city": "Mumbai",
-  "country": "India",
-  "mpin": "1234",
-  "pan": "DROOO7827U",
-  "aadhar": "123456792678",
-  "wallet_balance": 1000
-}
 
 POST 
 http://localhost:5000/login
@@ -41,7 +19,7 @@ POST
 http://localhost:5000/logout
 
 add access tokens in auth headers
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MDUyNzA1OCwianRpIjoiN2ZiODZmMDAtMjUzMy00YWY2LTk3M2UtMTM1N2NiNzY4MWU0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImNhcGF5YW5pIiwibmJmIjoxNzYwNTI3MDU4LCJjc3JmIjoiMGYyNjY1YWEtZTI1My00Njk1LTg2YzUtM2ZmNTI5NjQwMzgyIiwiZXhwIjoxNzYwNTI3OTU4LCJyb2xlIjoidXNlciJ9.NshGjDajHAG4LefKAOnKjGPmgu6wiRVutacjmeexbB4
+
 # bills endpoint to fetch amount to be paid
 POST
 http://localhost:5000/electricity/bill

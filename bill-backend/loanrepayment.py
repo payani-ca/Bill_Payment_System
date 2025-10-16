@@ -5,7 +5,7 @@ from controllers import wallets_col, transactions_col, check_password
 from constants.utilitiesconst import UTILITIES
 import uuid
 
-loan_bp = Blueprint("loanrepayment", __name__, url_prefix="/loanrepayment")
+loan_bp = Blueprint("loanrepayment", __name__, url_prefix="/api/loanrepayment")
 
 def sum_ascii(s):
     return sum(ord(ch) for ch in s)

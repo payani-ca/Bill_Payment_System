@@ -437,7 +437,7 @@ export default function Register() {
         userID: uuidv4(),
         ...form,
       };
-      const res = await axiosClient.post("/register", payload);
+      const res = await axiosClient.post("/api/register", payload);
       setLoading(false);
       if (res.status === 201) {
         setSuccessPopup(true);

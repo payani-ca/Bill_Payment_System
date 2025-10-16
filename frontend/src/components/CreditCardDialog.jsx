@@ -40,7 +40,7 @@ export default function CreditCardDialog({ open, onClose }) {
   const fetchWalletBalance = async () => {
     if (!user?.UserID) return;
     setLoadingWallet(true);
-    try { const res = await fetchWithAuth(`/wallets/${user.UserID}`, { method: "GET" }); setWalletBalance(res.data?.Amount ?? null); } 
+    try { const res = await fetchWithAuth(`/api/wallets/${user.UserID}`, { method: "GET" }); setWalletBalance(res.data?.Amount ?? null); } 
     catch { setWalletBalance(null); } finally { setLoadingWallet(false); }
   };
 
@@ -48,7 +48,7 @@ export default function CreditCardDialog({ open, onClose }) {
     if (!provider) return setError("Select provider.");
     setError(null); setSuccess(null); setLoading(true);
     try {
-      const res = await fetchWithAuth("/creditcard/bill", { method: "POST", data: { provider } });
+      const res = await fetchWithAuth("/api/creditcard/bill", { method: "POST", data: { provider } });
       setBillAmount(res.data.bill_amount);
       setServiceNo(res.data.ServiceNo);
     } catch (err) { setError(err?.response?.data?.msg || "Failed to fetch bill."); setBillAmount(null); }
@@ -63,7 +63,7 @@ export default function CreditCardDialog({ open, onClose }) {
     setLoading(true); setError(null); setSuccess(null);
     try {
       const payload = { provider, card_number: cardNumber, bill_amount: billAmount, mpin, service_no: serviceNo };
-      const res = await fetchWithAuth("/creditcard/pay", { method: "POST", data: payload });
+      const res = await fetchWithAuth("/api/creditcard/pay", { method: "POST", data: payload });
       setSuccess(`Payment successful! New balance: ₹ ${res.data.RemainingBalance}`);
       setWalletBalance(res.data.RemainingBalance);
       setMpin(""); setCardNumber("");

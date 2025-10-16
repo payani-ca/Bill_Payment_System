@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # React Frontend Service
+  frontend:
+    build:
+      context: ./frontend # Path to your React app
+    ports:
+      - "3000:80" # Map host port 3000 to container port 80 (Nginx)
+    depends_on:
+      - backend
+
+  # Flask Backend Service
+  backend:
+    build:
+      context: ./bill-backend # Path to your Flask app
+    ports:
+      - "5000:5000"
+    environment:
+      # This is where we pass the new MongoDB URL to our Flask app
+      - MONGO_URL=mongodb://mongo:27017/billingsystem
+    depends_on:
+      - mongo
+
+  # MongoDB Service
+  mongo:
+    image: mongo:latest # Use the official MongoDB image
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db # This makes your data persist even if the container is removed
+
+# Define a named volume for data persistence
+volumes:
+  mongo-data:

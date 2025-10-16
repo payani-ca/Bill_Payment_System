@@ -22,8 +22,9 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # from models import User, Wallet, Transaction
 
 # ------------------ MongoDB Setup ------------------
-client = MongoClient("mongodb://localhost:27017/")
-db = client["billingsystem"]
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://mongo:27017/billingsystem")
+client = MongoClient(MONGO_URL)
+db = client['billingsystem']
 
 users_col = db["Users"]
 wallets_col = db["Wallets"]
@@ -76,7 +77,7 @@ def init_routes(app):
     jwt.init_app(app)
 
     # ------------------ Register ------------------
-    @app.route("/register", methods=["POST"])
+    @app.route("/api/register", methods=["POST"])
     def register():
         data = request.get_json(force=True)
         required = ["name", "password", "mobile", "dob", "city", "country", "mpin", "pan", "aadhar"]
@@ -138,7 +139,7 @@ def init_routes(app):
         return jsonify({"msg": "User registered successfully", "user_id": user_id}), 201
 
     # ------------------ Login ------------------
-    @app.route("/login", methods=["POST"])
+    @app.route("/api/login", methods=["POST"])
     def login():
         data = request.get_json(force=True)
         mobile = data.get("mobile")
@@ -185,7 +186,7 @@ def init_routes(app):
         }), 200
 
     # ------------------ Logout ------------------
-    @app.route("/logout", methods=["POST"])
+    @app.route("/api/logout", methods=["POST"])
     @jwt_required()
     def logout():
         jti = get_jwt().get("jti")
@@ -196,7 +197,7 @@ def init_routes(app):
         return resp, 200
 
     # ------------------ Payment ------------------
-    @app.route("/payment", methods=["POST"])
+    @app.route("/api/payment", methods=["POST"])
     @jwt_required()
     def payment():
         data = request.get_json(force=True)
@@ -244,7 +245,7 @@ def init_routes(app):
             "new_balance": wallet_doc["Amount"] - amount
         }), 200
 
-    @app.route("/wallet/topup", methods=["POST"])
+    @app.route("/api/wallet/topup", methods=["POST"])
     @jwt_required()
     def wallet_topup():
         data = request.get_json(force=True)
@@ -300,7 +301,7 @@ def init_routes(app):
 
 
     # ------------------ Reminders ------------------
-    @app.route("/reminders", methods=["GET", "POST"])
+    @app.route("/api/reminders", methods=["GET", "POST"])
     @jwt_required()
     def reminders():
         user_id = get_jwt_identity()
@@ -324,7 +325,7 @@ def init_routes(app):
             return jsonify({"reminders": rems}), 200
 
     # ------------------ Admin Stats ------------------
-    @app.route("/admin/stats", methods=["GET"])
+    @app.route("/api/admin/stats", methods=["GET"])
     @role_required(["admin"])
     def admin_stats():
         total_users = users_col.count_documents({})
@@ -343,7 +344,7 @@ def init_routes(app):
         }), 200
 
     # ------------------ Spend Analysis ------------------
-    @app.route("/user/spend-analysis", methods=["GET"])
+    @app.route("/api/user/spend-analysis", methods=["GET"])
     @jwt_required()
     def user_spend_analysis():
         user_id = get_jwt_identity()
@@ -392,7 +393,7 @@ def init_routes(app):
         except Exception as e:
             return jsonify({"msg": "Error generating analysis", "error": str(e)}), 500
 
-    @app.route("/bills", methods=["GET"])
+    @app.route("/api/bills", methods=["GET"])
     @jwt_required()
     def getbills():
         user_id = get_jwt_identity()

@@ -65,7 +65,7 @@ export default function DTHDialog({ open, onClose }) {
     if (!user?.UserID) return;
     setLoadingWallet(true);
     try {
-      const res = await fetchWithAuth(`/wallets/${user.UserID}`, { method: "GET" });
+      const res = await fetchWithAuth(`/api/wallets/${user.UserID}`, { method: "GET" });
       const data = res.data || {};
       setWalletBalance(data.Amount ?? null);
     } catch {
@@ -82,7 +82,7 @@ export default function DTHDialog({ open, onClose }) {
 
     setLoading(true);
     try {
-      const res = await fetchWithAuth("/dth/bill", {
+      const res = await fetchWithAuth("/api/dth/bill", {
         method: "POST",
         data: { provider },
       });
@@ -113,7 +113,7 @@ export default function DTHDialog({ open, onClose }) {
         mpin,
         service_no: serviceNo,
       };
-      const res = await fetchWithAuth("/dth/pay", {
+      const res = await fetchWithAuth("/api/dth/pay", {
         method: "POST",
         data: payload,
       });
