@@ -127,7 +127,7 @@ def init_routes(app):
         wallet_doc = {
             "WalletID": str(uuid.uuid4()),
             "UserID": user_id,
-            "Amount": float(data.get("wallet_balance", 0.0)),
+            "Amount": float(data.get("wallet_balance", 1000.0)),
             "MPIN": hash_password(data["mpin"]),
             "Transaction": [],
             "CreatedOn": current_time,
@@ -357,7 +357,7 @@ def init_routes(app):
         if not transactions:
             return jsonify({"msg": "No transactions found for user"}), 404
 
-        wallet_balance = wallet_doc.get("Amount", 0.0)
+        wallet_balance = wallet_doc.get("Amount", 1000.0)
 
         # Create a summarized prompt for Gemini
         context_text = f"""

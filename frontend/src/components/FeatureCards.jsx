@@ -1,6 +1,6 @@
 // src/components/FeatureCards.jsx
 import React, { useState } from 'react'
-import { Grid } from '@mui/material'
+import { Grid, Box } from '@mui/material'
 import StyledCard from './StyledCard'
 import ElectricityDialog from './ElectricityDialog'
 import DTHDialog from './DTHDialog'
@@ -11,80 +11,87 @@ import GasBillDialog from './GasBillDialog'
 import CreditCardDialog from './CreditCardDialog'
 import FastTagDialog from './FastTagDialog'
 
-
 const FEATURES = [
-  { key: 'electricity', title: 'Electricity Bill', subtitle: 'Pay electricity bills', image: '/assets/pay-1.png' },
-  { key: 'dth', title: 'DTH Recharge', subtitle: 'Recharge your DTH', image: '/assets/pay-2.png' },
-  { key: 'mobile', title: 'Mobile Recharge', subtitle: 'Prepaid & Postpaid', image: '/assets/pay-3.png' },
-  { key: 'water', title: 'Water Bill', subtitle: 'Pay water bill', image: '/assets/pay-1.png' },
-  { key: 'gas', title: 'Gas Bill', subtitle: 'Pay gas bill', image: '/assets/pay-2.png' },
-  // { key: 'internet', title: 'Internet', subtitle: 'ISP payments', image: '/assets/pay-3.png' },
-  { key: 'loan', title: 'Loan Repayment', subtitle: 'Pay your loans', image: '/assets/pay-4.png' },
-  { key: 'fasttag', title: 'Fastag', subtitle: 'Recharge your Fastag', image: '/assets/pay-5.png' },
-  { key: 'creditcard', title: 'Credit Card', subtitle: 'Pay credit card bills', image: '/assets/pay-6.png' },
-
-
+  { key: 'electricity', title: 'Electricity Bill', subtitle: 'Pay electricity bills', image: '/assets/elect (1).jpg' },
+  { key: 'dth', title: 'DTH Recharge', subtitle: 'Recharge your DTH', image: '/assets/dth_recharge (1).jpg' },
+  { key: 'mobile', title: 'Mobile Recharge', subtitle: 'Prepaid & Postpaid', image: '/assets/mobile (1).jpg' },
+  { key: 'water', title: 'Water Bill', subtitle: 'Pay water bill', image: '/assets/water-bill (1).jpg' },
+  { key: 'gas', title: 'Gas Bill', subtitle: 'Pay gas bill', image: '/assets/gasbill (1).jpg' },
+  { key: 'loan', title: 'Loan Repayment', subtitle: 'Pay your loans', image: '/assets/loan (1).jpg' },
+  { key: 'fasttag', title: 'Fastag', subtitle: 'Recharge your Fastag', image: '/assets/fastag (1).jpg' },
+  { key: 'creditcard', title: 'Credit Card', subtitle: 'Pay credit card bills', image: '/assets/credit (1).jpg' },
 ]
 
-
 export default function FeatureCards() {
-  const [openElectricity, setOpenElectricity] = useState(false)
-  const [openDTH, setOpenDTH] = useState(false)
-  const [openMobile, setOpenMobile] = useState(false)
-  const [openWater, setOpenWater] = useState(false)
-  const [openLoan, setOpenLoan] = useState(false)
-  const [openGas, setOpenGas] = useState(false)
-  const [openFasttag, setOpenFasttag] = useState(false)
-  const [openCreditCard, setOpenCreditCard] = useState(false)
-
+  const [openDialog, setOpenDialog] = useState({
+    electricity: false,
+    dth: false,
+    mobile: false,
+    water: false,
+    gas: false,
+    loan: false,
+    fasttag: false,
+    creditcard: false,
+  })
 
   const onCardClick = (key) => {
-    if (key === 'electricity') {
-      setOpenElectricity(true)
-    } else if (key === 'dth') {
-      setOpenDTH(true)
-    } else if (key === 'mobile') {
-      setOpenMobile(true)
-    } else if (key === 'water') {
-      setOpenWater(true)
-    } else if (key === 'loan') { 
-      setOpenLoan(true)
-    } else if (key === 'gas') { 
-      setOpenGas(true)
-    } else if (key === 'fasttag') { 
-      setOpenFasttag(true)
-    } else if (key === 'creditcard') { 
-      setOpenCreditCard(true)
-    } else {
-      // TODO: handle other features (open modal, route, etc.)
-      alert(`${key} clicked — implement action.`)
-    }
+    setOpenDialog(prev => ({ ...prev, [key]: true }))
+  }
+
+  const closeDialog = (key) => {
+    setOpenDialog(prev => ({ ...prev, [key]: false }))
   }
 
   return (
-    <>
-      <Grid container spacing={3}>
-        {FEATURES.map(f => (
-          <Grid item xs={12} sm={6} md={4} key={f.key}>
-            <StyledCard 
-              image={f.image} 
-              title={f.title} 
-              subtitle={f.subtitle} 
-              onClick={() => onCardClick(f.key)} 
+    <Box
+      sx={{
+        flexGrow: 1,
+        width: '100%',
+        mt: 3,
+        display: 'flex',
+        justifyContent: 'center',
+      }}
+    >
+      <Grid
+        container
+        spacing={3}
+        sx={{
+          width: '100%',
+          maxWidth: '900px', // keeps nice centered layout
+          justifyContent: 'center',
+        }}
+      >
+        {FEATURES.map((f) => (
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={6}
+            key={f.key}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <StyledCard
+              image={f.image}
+              title={f.title}
+              subtitle={f.subtitle}
+              onClick={() => onCardClick(f.key)}
             />
           </Grid>
         ))}
       </Grid>
-      
+
       {/* Dialogs */}
-      <ElectricityDialog open={openElectricity} onClose={() => setOpenElectricity(false)} />
-      <DTHDialog open={openDTH} onClose={() => setOpenDTH(false)} />
-      <MobileRechargeDialog open={openMobile} onClose={() => setOpenMobile(false)} />
-      <WaterBillDialog open={openWater} onClose={() => setOpenWater(false)} />
-      <LoanRepaymentDialog open={openLoan} onClose={() => setOpenLoan(false)} />
-      <GasBillDialog open={openGas} onClose={() => setOpenGas(false)} />
-      <CreditCardDialog open={openCreditCard} onClose={() => setOpenCreditCard(false)} />
-      <FastTagDialog open={openFasttag} onClose={() => setOpenFasttag(false)} />
-    </>
+      <ElectricityDialog open={openDialog.electricity} onClose={() => closeDialog('electricity')} />
+      <DTHDialog open={openDialog.dth} onClose={() => closeDialog('dth')} />
+      <MobileRechargeDialog open={openDialog.mobile} onClose={() => closeDialog('mobile')} />
+      <WaterBillDialog open={openDialog.water} onClose={() => closeDialog('water')} />
+      <LoanRepaymentDialog open={openDialog.loan} onClose={() => closeDialog('loan')} />
+      <GasBillDialog open={openDialog.gas} onClose={() => closeDialog('gas')} />
+      <FastTagDialog open={openDialog.fasttag} onClose={() => closeDialog('fasttag')} />
+      <CreditCardDialog open={openDialog.creditcard} onClose={() => closeDialog('creditcard')} />
+    </Box>
   )
 }
