@@ -10,6 +10,12 @@ import bcrypt
 import re
 from pymongo import MongoClient
 import uuid
+import os
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+load_dotenv()
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # It's assumed your models.py defines classes primarily for structure/type-hinting,
 # but we will build dictionaries manually here to ensure DB key consistency.
@@ -335,3 +341,54 @@ def init_routes(app):
             "total_wallet_balance": total_wallet_balance,
             "total_transactions": total_transactions
         }), 200
+
+    # ------------------ Spend Analysis ------------------
+    @app.route("/user/spend-analysis", methods=["GET"])
+    @jwt_required()
+    def user_spend_analysis():
+        user_id = get_jwt_identity()
+
+        wallet_doc = wallets_col.find_one({"UserID": user_id})
+        transactions = list(transactions_col.find({"UserID": user_id}, {"_id": 0}))
+
+        if not wallet_doc:
+            return jsonify({"msg": "Wallet not found"}), 404
+
+        if not transactions:
+            return jsonify({"msg": "No transactions found for user"}), 404
+
+        wallet_balance = wallet_doc.get("Amount", 0.0)
+
+        # Create a summarized prompt for Gemini
+        context_text = f"""
+        The user (ID: {user_id}) has a wallet balance of ₹{wallet_balance}.
+        Here are their last 10 transactions:
+
+        """
+
+        for tx in transactions[-10:]:
+            context_text += f"- ₹{tx.get('Amount')} spent on {tx.get('VendorDetails')} ({tx.get('SpentOn')})\n"
+
+        context_text += """
+        Provide a concise financial analysis (max 100 words) summarizing the user's spending behavior,
+        highlighting key spending areas, and suggest 3 clear ways to save or manage money better.
+        Format output as:
+        1️⃣ Spending Summary
+        2️⃣ Suggestions (3 short points)
+        Keep it human-readable and well formatted.
+        """
+
+        try:
+            model = genai.GenerativeModel("gemini-2.0-flash")
+            response = model.generate_content(context_text)
+            analysis = response.text.strip()
+
+            return jsonify({
+                "user_id": user_id,
+                "wallet_balance": wallet_balance,
+                "analysis": analysis
+            }), 200
+
+        except Exception as e:
+            return jsonify({"msg": "Error generating analysis", "error": str(e)}), 500
+
