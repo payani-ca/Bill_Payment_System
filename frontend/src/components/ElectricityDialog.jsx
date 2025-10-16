@@ -1,4 +1,3 @@
-// src/components/ElectricityDialog.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
@@ -18,14 +17,14 @@ import {
   MenuItem,
   TextField,
   Autocomplete,
-  Divider,
   IconButton,
+  Chip,
 } from "@mui/material";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import FlashOnIcon from "@mui/icons-material/FlashOn";
 import CloseIcon from "@mui/icons-material/Close";
-import { useAuth } from "../auth/AuthProvider";
+import { motion, AnimatePresence } from "framer-motion";
 
-// Inline electricity map (move to constants if you prefer)
 const ELECTRICITY_MAP = {
   "Andhra Pradesh": ["APEPDCL", "APSPDCL"],
   Telangana: ["TSSPDCL", "TSNPDCL"],
@@ -43,7 +42,7 @@ const ELECTRICITY_MAP = {
   Odisha: ["TPCODL", "TPWODL", "TPSODL", "TPNODL"],
   Punjab: ["PSPCL"],
   Haryana: ["DHBVN", "UHBVN"],
-  "Chhattisgarh": ["CSPDCL"],
+  Chhattisgarh: ["CSPDCL"],
   Goa: ["Goa Electricity Department"],
   Assam: ["APDCL"],
   Jharkhand: ["JUVNL", "JBVNL"],
@@ -53,8 +52,6 @@ const ELECTRICITY_MAP = {
 };
 
 export default function ElectricityDialog({ open, onClose }) {
-  const { user, fetchWithAuth } = useAuth();
-
   const [state, setState] = useState("");
   const [provider, setProvider] = useState("");
   const [serviceNo, setServiceNo] = useState("");
@@ -64,13 +61,12 @@ export default function ElectricityDialog({ open, onClose }) {
   const [loadingWallet, setLoadingWallet] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [walletBalance, setWalletBalance] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(5000);
 
   const states = useMemo(() => Object.keys(ELECTRICITY_MAP), []);
 
   useEffect(() => {
     if (!open) {
-      // reset when closing
       setState("");
       setProvider("");
       setServiceNo("");
@@ -78,31 +74,8 @@ export default function ElectricityDialog({ open, onClose }) {
       setMpin("");
       setError(null);
       setSuccess(null);
-      setLoading(false);
-      setWalletBalance(null);
-    } else {
-      // fetch wallet balance to show in header (best-effort)
-      fetchWalletBalance();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
-
-  const fetchWalletBalance = async () => {
-    if (!user?.UserID) return;
-    setLoadingWallet(true);
-    try {
-      const res = await fetchWithAuth(`/wallets/${user.UserID}`, { method: "GET" });
-      // if backend returns object with Amount
-      const data = res.data || {};
-      if (data.Amount !== undefined) setWalletBalance(data.Amount);
-      else setWalletBalance(null);
-    } catch (err) {
-      // ignore — wallet info is optional
-      setWalletBalance(null);
-    } finally {
-      setLoadingWallet(false);
-    }
-  };
 
   const providerOptions = state ? ELECTRICITY_MAP[state] : [];
 
@@ -113,242 +86,208 @@ export default function ElectricityDialog({ open, onClose }) {
     if (!provider) return setError("Please select a provider.");
 
     setLoading(true);
-    try {
-      const res = await fetchWithAuth("/electricity/bill", {
-        method: "POST",
-        data: { state, provider },
-      });
-      const data = res.data;
-      setBillAmount(data.bill_amount);
-      if (data.ServiceNo) setServiceNo(data.ServiceNo);
-      setSuccess(null);
-    } catch (err) {
-      setError(err?.response?.data?.msg || err.message || "Failed to fetch bill.");
-      setBillAmount(null);
-      setServiceNo("");
-    } finally {
+    setTimeout(() => {
+      setBillAmount(1250);
+      setServiceNo(serviceNo || "SERV" + Math.floor(Math.random() * 100000));
       setLoading(false);
-    }
+    }, 1000);
   };
 
   const pay = async () => {
     setError(null);
     setSuccess(null);
 
-    if (!serviceNo || billAmount === null) {
-      setError("Please fetch the bill before paying.");
-      return;
-    }
-    if (!/^\d{4}$/.test(mpin)) {
-      setError("Enter a valid 4-digit MPIN.");
-      return;
-    }
+    if (!serviceNo || billAmount === null) return setError("Fetch the bill before paying.");
+    if (!/^\d{4}$/.test(mpin)) return setError("Enter a valid 4-digit MPIN.");
 
     setLoading(true);
-    try {
-      const payload = {
-        state,
-        provider,
-        mobile: user?.Mobile || "",
-        bill_amount: billAmount,
-        mpin,
-        service_no: serviceNo,
-      };
-      const res = await fetchWithAuth("/electricity/pay", {
-        method: "POST",
-        data: payload,
-      });
-      const data = res.data;
-      let msg = data.msg || "Payment successful.";
-      if (data.new_balance !== undefined) msg += ` New balance: ₹ ${data.new_balance}`;
-      setSuccess(msg);
-      setError(null);
+    setTimeout(() => {
+      const newBalance = walletBalance - billAmount;
+      setSuccess(`Payment successful. New balance: ₹ ${newBalance}`);
+      setWalletBalance(newBalance);
       setMpin("");
-      // update wallet balance shown
-      if (data.new_balance !== undefined) setWalletBalance(data.new_balance);
-    } catch (err) {
-      setError(err?.response?.data?.msg || err.message || "Payment failed.");
-    } finally {
       setLoading(false);
-    }
+    }, 1500);
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
-        <Box>
-          <Typography variant="h6">Electricity Bill Payment</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Choose state & provider then fetch the current bill.
+      <DialogTitle
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          bgcolor: "#f9fbff",
+          borderBottom: "1px solid #eaeaea",
+          pb: 2,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <FlashOnIcon color="warning" />
+          <Typography variant="h6" fontWeight={700}>
+            Electricity Bill Payment
           </Typography>
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <AccountBalanceWalletIcon color="primary" />
-          <Box sx={{ textAlign: "right" }}>
-            <Typography variant="body2" sx={{ fontWeight: 700 }}>
-              Wallet
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {loadingWallet ? <CircularProgress size={14} /> : walletBalance !== null ? `₹ ${walletBalance}` : "—"}
-            </Typography>
-          </Box>
-
-          <IconButton onClick={onClose} size="small" aria-label="close">
+          <Chip
+            icon={<AccountBalanceWalletIcon />}
+            label={
+              loadingWallet
+                ? "Fetching..."
+                : walletBalance !== null
+                ? `₹ ${walletBalance}`
+                : "—"
+            }
+            color="primary"
+            variant="outlined"
+            size="small"
+          />
+          <IconButton onClick={onClose} size="small">
             <CloseIcon />
           </IconButton>
         </Box>
       </DialogTitle>
 
-      <Divider />
-
-      <DialogContent dividers>
-        <Box sx={{ mb: 2 }}>
-          <Paper variant="outlined" sx={{ p: 2, bgcolor: "#fbfdff" }}>
-            <Typography variant="body2" color="text.secondary">
-              Please enter the details below. Service number will be generated by the system if left blank.
-            </Typography>
-          </Paper>
-        </Box>
-
-        <Grid container spacing={2}>
-          {/* 1) State - full width */}
-          <Grid item xs={12}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="state-label">State</InputLabel>
-              <Select
-                labelId="state-label"
-                label="State"
-                value={state}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setState(v);
-                  setProvider("");
-                  setServiceNo("");
-                  setBillAmount(null);
-                  setError(null);
-                  setSuccess(null);
-                }}
-                displayEmpty
-              >
-                <MenuItem value="">
-                  <em>Choose state</em>
-                </MenuItem>
-                {states.map((s) => (
-                  <MenuItem key={s} value={s}>
-                    {s}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          {/* 2) Provider - full width */}
-          <Grid item xs={12}>
-            <Autocomplete
-              options={providerOptions}
-              value={provider || null}
-              onChange={(e, value) => {
-                setProvider(value || "");
-                setServiceNo("");
+      <DialogContent sx={{ mt: 3, px: 3 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+          {/* State Select */}
+          <FormControl fullWidth size="small">
+            <InputLabel>State</InputLabel>
+            <Select
+              value={state}
+              label="State"
+              onChange={(e) => {
+                setState(e.target.value);
+                setProvider("");
                 setBillAmount(null);
-                setError(null);
-                setSuccess(null);
               }}
-              disabled={!state}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Service Provider"
-                  size="small"
-                  placeholder={state ? "Select provider" : "Select state first"}
-                />
-              )}
-              fullWidth
-            />
-          </Grid>
-
-          {/* 3) Service No. */}
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Service No."
-              size="small"
-              value={serviceNo}
-              onChange={(e) => setServiceNo(e.target.value)}
-              helperText="Optional. Leave blank to let the system generate it when fetching the bill."
-            />
-          </Grid>
-
-          {/* 4) Fetch Bill button */}
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={fetchBill}
-              disabled={!state || !provider || loading}
-              startIcon={loading ? <CircularProgress size={16} color="inherit" /> : null}
-              sx={{ py: 1.25, fontWeight: 700 }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 300,
+                  },
+                },
+              }}
             >
-              {loading ? "Fetching..." : "Fetch Bill"}
-            </Button>
-          </Grid>
+              {states.map((s) => (
+                <MenuItem key={s} value={s}>
+                  {s}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-          {/* 5) Bill amount */}
-          <Grid item xs={12}>
-            {billAmount !== null ? (
-              <Paper elevation={0} sx={{ p: 2, borderRadius: 1, bgcolor: "#f6fbf9", border: "1px solid #e6f4ea" }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Bill Amount
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5 }}>
-                  ₹ {billAmount}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Provider: {provider} • State: {state}
-                </Typography>
-              </Paper>
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                No bill fetched yet.
-              </Typography>
+          {/* Provider Autocomplete */}
+          <Autocomplete
+            options={providerOptions}
+            value={provider || null}
+            onChange={(e, val) => {
+              setProvider(val || "");
+              setBillAmount(null);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Service Provider"
+                size="small"
+                fullWidth
+              />
             )}
-          </Grid>
+            disabled={!state}
+            fullWidth
+            ListboxProps={{
+              style: { maxHeight: 250 },
+            }}
+          />
 
-          {/* 6) MPIN */}
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="MPIN (4 digits)"
-              size="small"
-              value={mpin}
-              onChange={(e) => setMpin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-              inputProps={{ inputMode: "numeric", maxLength: 4 }}
-            />
-          </Grid>
+          {/* Service Number */}
+          <TextField
+            label="Service No."
+            value={serviceNo}
+            onChange={(e) => setServiceNo(e.target.value)}
+            size="small"
+            fullWidth
+            helperText="Leave blank if system should generate automatically."
+          />
 
-          {/* Pay */}
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              onClick={pay}
-              disabled={loading || billAmount === null}
-              sx={{ py: 1.25, fontWeight: 700 }}
-            >
-              {loading ? <CircularProgress size={16} color="inherit" /> : "Pay from Wallet"}
-            </Button>
-          </Grid>
-          {/* feedback */}
-          <Grid item xs={12}>
-            {error && <Alert severity="error">{error}</Alert>}
-            {success && <Alert severity="success">{success}</Alert>}
-          </Grid>
-        </Grid>
+          {/* Fetch Bill Button */}
+          <Button
+            fullWidth
+            variant="contained"
+            color="warning"
+            onClick={fetchBill}
+            disabled={loading || !provider}
+            sx={{ py: 1.2, fontWeight: 700 }}
+            startIcon={loading && <CircularProgress size={16} color="inherit" />}
+          >
+            {loading ? "Fetching..." : "Fetch Bill"}
+          </Button>
+
+          {/* Bill Amount Display */}
+          <AnimatePresence>
+            {billAmount !== null && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <Paper
+                  sx={{
+                    p: 2.5,
+                    textAlign: "center",
+                    borderRadius: 2,
+                    bgcolor: "#f4faf7",
+                    border: "1px solid #e0f0e6",
+                  }}
+                >
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Bill Amount
+                  </Typography>
+                  <Typography variant="h4" fontWeight={800} color="success.main" sx={{ my: 0.5 }}>
+                    ₹ {billAmount}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {provider} ({state})
+                  </Typography>
+                </Paper>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* MPIN */}
+          <TextField
+            label="MPIN (4 digits)"
+            value={mpin}
+            onChange={(e) =>
+              setMpin(e.target.value.replace(/\D/g, "").slice(0, 4))
+            }
+            inputProps={{ inputMode: "numeric", maxLength: 4 }}
+            fullWidth
+            size="small"
+            type="password"
+          />
+
+          {/* Pay Button */}
+          <Button
+            fullWidth
+            variant="contained"
+            color="success"
+            onClick={pay}
+            disabled={!billAmount || loading || !mpin}
+            sx={{ py: 1.2, fontWeight: 700 }}
+            startIcon={loading && <CircularProgress size={16} color="inherit" />}
+          >
+            {loading ? "Processing..." : "Pay from Wallet"}
+          </Button>
+
+          {/* Alerts */}
+          {error && <Alert severity="error">{error}</Alert>}
+          {success && <Alert severity="success">{success}</Alert>}
+        </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 2 }}>
+      <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose} color="inherit">
           Close
         </Button>

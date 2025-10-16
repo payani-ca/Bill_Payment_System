@@ -111,10 +111,10 @@ export default function Login() {
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Avatar sx={{ bgcolor: "rgba(255,255,255,0.14)", width: 56, height: 56 }}>BP</Avatar>
+                <Avatar sx={{ bgcolor: "rgba(255,255,255,0.14)", width: 56, height: 56 }}>TP</Avatar>
                 <Box>
                   <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                    BillPay
+                    TrackonPay
                   </Typography>
                   <Typography variant="body2" sx={{ opacity: 0.95 }}>
                     Pay bills simply • securely • fast
